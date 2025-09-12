@@ -141,7 +141,16 @@ export function DataTable<T>({ columns, data, filterableColumns }: Props<T>) {
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {(() => {
+                      if (typeof column.columnDef.header === "string") {
+                        return column.columnDef.header;
+                      }
+
+                      return column.id
+                        .replace(/([A-Z])/g, " $1")
+                        .replace(/^./, (str) => str.toUpperCase())
+                        .trim();
+                    })()}
                   </DropdownMenuCheckboxItem>
                 );
               })}

@@ -1,6 +1,7 @@
 import { ModeToggle } from "@/components/features/common/mode-toggle";
 import { AppSidebar } from "@/components/features/dashboard/app-sidebar";
 import { PatientBreadcrumbs } from "@/components/features/dashboard/patient-breadcrumbs";
+import { CreatePatientModal } from "@/components/features/dashboard/create-patient-modal";
 
 import { Separator } from "@/components/ui/separator";
 import {
@@ -27,7 +28,8 @@ export default function RootLayout({
             />
             <PatientBreadcrumbs />
           </div>
-          <div className="px-4 flex-shrink-0">
+          <div className="px-4 flex-shrink-0 flex items-center gap-2">
+            <CreatePatientModal />
             <ModeToggle />
           </div>
         </header>

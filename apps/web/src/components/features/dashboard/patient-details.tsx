@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,6 +22,20 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
+const editPatientSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  dob: z.string().min(1, "Date of birth is required"),
+  additionalInformation: z.string().optional(),
+});
+
+type EditPatientFormData = z.infer<typeof editPatientSchema>;
+
 interface PatientDetailsProps {
   patient: Patient;
 }
@@ -29,22 +46,45 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  const [editedPatient, setEditedPatient] = useState<Patient | undefined>(
-    patient
-  );
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    setValue,
+    watch,
+  } = useForm<EditPatientFormData>({
+    resolver: zodResolver(editPatientSchema),
+    defaultValues: {
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      email: patient.email,
+      phoneNumber: patient.phoneNumber,
+      dob: patient.dob,
+      additionalInformation: patient.additionalInformation || "",
+    },
+  });
+
+  const watchedValues = watch();
 
   // Check for edit mode query parameter on component mount
   useEffect(() => {
     const editMode = searchParams.get("edit");
     if (editMode === "true") {
       setIsEditing(true);
-      setEditedPatient(patient);
     }
-  }, [searchParams, patient]);
+  }, [searchParams]);
 
   const handleEdit = () => {
     setIsEditing(true);
-    setEditedPatient(patient);
+    reset({
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      email: patient.email,
+      phoneNumber: patient.phoneNumber,
+      dob: patient.dob,
+      additionalInformation: patient.additionalInformation || "",
+    });
     // Update URL to include edit mode
     const url = new URL(window.location.href);
     url.searchParams.set("edit", "true");
@@ -53,24 +93,29 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditedPatient(patient);
+    reset({
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      email: patient.email,
+      phoneNumber: patient.phoneNumber,
+      dob: patient.dob,
+      additionalInformation: patient.additionalInformation || "",
+    });
     // Remove edit mode from URL
     const url = new URL(window.location.href);
     url.searchParams.delete("edit");
     router.replace(url.pathname + url.search);
   };
 
-  const handleSave = () => {
-    if (editedPatient) {
-      // TODO: Implement this
-      console.log("Saving patient:", editedPatient);
-      setIsEditing(false);
+  const onFormSubmit = (data: EditPatientFormData) => {
+    // TODO: Implement this - integrate with API
+    console.log("Saving patient:", data);
+    setIsEditing(false);
 
-      // Remove edit mode from URL
-      const url = new URL(window.location.href);
-      url.searchParams.delete("edit");
-      router.replace(url.pathname + url.search);
-    }
+    // Remove edit mode from URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete("edit");
+    router.replace(url.pathname + url.search);
   };
 
   const handleDelete = () => {
@@ -79,20 +124,10 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
     router.push("/patients");
   };
 
-  const handleInputChange = (field: keyof Patient, value: string) => {
-    setEditedPatient((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        [field]: value,
-      };
-    });
-  };
-
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       const formattedDate = format(date, "yyyy-MM-dd");
-      handleInputChange("dob", formattedDate);
+      setValue("dob", formattedDate);
       setIsCalendarOpen(false);
     }
   };
@@ -105,7 +140,7 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
     return format(new Date(dateString), "PPP");
   };
 
-  const currentData = isEditing && editedPatient ? editedPatient : patient;
+  const currentData = isEditing ? watchedValues : patient;
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 transition-all duration-300 min-w-0 overflow-hidden">
@@ -147,9 +182,13 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
           ) : (
             <>
               <div className="transition-all duration-300 opacity-100 translate-x-0">
-                <Button onClick={handleSave} size="sm">
+                <Button
+                  onClick={handleSubmit(onFormSubmit)}
+                  size="sm"
+                  disabled={isSubmitting}
+                >
                   <Save className="h-4 w-4 mr-2" />
-                  Save Changes
+                  {isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
               <div className="transition-all duration-300 opacity-100 translate-x-0">
@@ -179,14 +218,21 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
                 </Label>
                 <div className="transition-all duration-300">
                   {isEditing ? (
-                    <Input
-                      id="firstName"
-                      value={currentData.firstName}
-                      onChange={(e) =>
-                        handleInputChange("firstName", e.target.value)
-                      }
-                      className="animate-in fade-in-0 slide-in-from-top-1 duration-300"
-                    />
+                    <div className="space-y-1">
+                      <Input
+                        id="firstName"
+                        {...register("firstName")}
+                        className={cn(
+                          "animate-in fade-in-0 slide-in-from-top-1 duration-300",
+                          errors.firstName && "border-error"
+                        )}
+                      />
+                      {errors.firstName && (
+                        <p className="text-sm text-error">
+                          {errors.firstName.message}
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
                       {currentData.firstName}
@@ -200,14 +246,21 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
                 </Label>
                 <div className="transition-all duration-300">
                   {isEditing ? (
-                    <Input
-                      id="lastName"
-                      value={currentData.lastName}
-                      onChange={(e) =>
-                        handleInputChange("lastName", e.target.value)
-                      }
-                      className="animate-in fade-in-0 slide-in-from-top-1 duration-300"
-                    />
+                    <div className="space-y-1">
+                      <Input
+                        id="lastName"
+                        {...register("lastName")}
+                        className={cn(
+                          "animate-in fade-in-0 slide-in-from-top-1 duration-300",
+                          errors.lastName && "border-error"
+                        )}
+                      />
+                      {errors.lastName && (
+                        <p className="text-sm text-error">
+                          {errors.lastName.message}
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
                       {currentData.lastName}
@@ -223,13 +276,22 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
               </Label>
               <div className="transition-all duration-300">
                 {isEditing ? (
-                  <Input
-                    id="email"
-                    type="email"
-                    value={currentData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    className="animate-in fade-in-0 slide-in-from-top-1 duration-300"
-                  />
+                  <div className="space-y-1">
+                    <Input
+                      id="email"
+                      type="email"
+                      {...register("email")}
+                      className={cn(
+                        "animate-in fade-in-0 slide-in-from-top-1 duration-300",
+                        errors.email && "border-error"
+                      )}
+                    />
+                    {errors.email && (
+                      <p className="text-sm text-error">
+                        {errors.email.message}
+                      </p>
+                    )}
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
                     {currentData.email}
@@ -244,14 +306,21 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
               </Label>
               <div className="transition-all duration-300">
                 {isEditing ? (
-                  <Input
-                    id="phoneNumber"
-                    value={currentData.phoneNumber}
-                    onChange={(e) =>
-                      handleInputChange("phoneNumber", e.target.value)
-                    }
-                    className="animate-in fade-in-0 slide-in-from-top-1 duration-300"
-                  />
+                  <div className="space-y-1">
+                    <Input
+                      id="phoneNumber"
+                      {...register("phoneNumber")}
+                      className={cn(
+                        "animate-in fade-in-0 slide-in-from-top-1 duration-300",
+                        errors.phoneNumber && "border-error"
+                      )}
+                    />
+                    {errors.phoneNumber && (
+                      <p className="text-sm text-error">
+                        {errors.phoneNumber.message}
+                      </p>
+                    )}
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
                     {currentData.phoneNumber}
@@ -266,41 +335,47 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
               </Label>
               <div className="transition-all duration-300">
                 {isEditing ? (
-                  <Popover
-                    open={isCalendarOpen}
-                    onOpenChange={setIsCalendarOpen}
-                  >
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal animate-in fade-in-0 slide-in-from-top-1 duration-300",
-                          !currentData.dob && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {currentData.dob ? (
-                          formatDateForDisplay(currentData.dob)
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={
-                          currentData.dob
-                            ? new Date(currentData.dob)
-                            : undefined
-                        }
-                        onSelect={handleDateSelect}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="space-y-1">
+                    <Popover
+                      open={isCalendarOpen}
+                      onOpenChange={setIsCalendarOpen}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal animate-in fade-in-0 slide-in-from-top-1 duration-300",
+                            !currentData.dob && "text-muted-foreground",
+                            errors.dob && "border-error"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {currentData.dob ? (
+                            formatDateForDisplay(currentData.dob)
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={
+                            currentData.dob
+                              ? new Date(currentData.dob)
+                              : undefined
+                          }
+                          onSelect={handleDateSelect}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {errors.dob && (
+                      <p className="text-sm text-error">{errors.dob.message}</p>
+                    )}
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
                     {formatDateForDisplay(currentData.dob)}
@@ -329,10 +404,7 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
                 {isEditing ? (
                   <Textarea
                     id="additionalInformation"
-                    value={currentData.additionalInformation || ""}
-                    onChange={(e) =>
-                      handleInputChange("additionalInformation", e.target.value)
-                    }
+                    {...register("additionalInformation")}
                     rows={6}
                     className="resize-none animate-in fade-in-0 slide-in-from-top-1 duration-300"
                   />
@@ -357,20 +429,18 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-sm font-semibold">Patient ID</Label>
-                <p className="text-sm text-muted-foreground">
-                  {currentData.id}
-                </p>
+                <p className="text-sm text-muted-foreground">{patient.id}</p>
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-semibold">Created At</Label>
                 <p className="text-sm text-muted-foreground">
-                  {formatDate(currentData.createdAt)}
+                  {formatDate(patient.createdAt)}
                 </p>
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-semibold">Last Updated</Label>
                 <p className="text-sm text-muted-foreground">
-                  {formatDate(currentData.updatedAt)}
+                  {formatDate(patient.updatedAt)}
                 </p>
               </div>
             </div>
