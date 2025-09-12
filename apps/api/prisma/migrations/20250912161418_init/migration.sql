@@ -23,7 +23,6 @@ CREATE TABLE "public"."patients" (
     "phone_number" TEXT NOT NULL,
     "date_of_birth" TIMESTAMP(3) NOT NULL,
     "additional_information" TEXT,
-    "created_by" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -35,6 +34,3 @@ CREATE UNIQUE INDEX "users_email_key" ON "public"."users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "patients_email_key" ON "public"."patients"("email");
-
--- AddForeignKey
-ALTER TABLE "public"."patients" ADD CONSTRAINT "patients_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

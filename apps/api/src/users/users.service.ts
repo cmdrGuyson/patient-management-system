@@ -23,7 +23,7 @@ export class UsersService {
    * @param id - The user ID to search for
    * @returns User object if found, null otherwise
    */
-  async findOneById(id: number): Promise<User | null> {
+  async findOne(id: number): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
