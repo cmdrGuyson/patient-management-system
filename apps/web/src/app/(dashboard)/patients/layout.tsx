@@ -9,6 +9,7 @@ import FullScreenLoader from "@/components/features/common/full-screen-loader";
 import { AppSidebar } from "@/components/features/dashboard/app-sidebar";
 import { PatientBreadcrumbs } from "@/components/features/dashboard/patient-breadcrumbs";
 import { CreatePatientModal } from "@/components/features/dashboard/create-patient-modal";
+import { Can } from "@/components/features/common/can";
 
 import { Separator } from "@/components/ui/separator";
 import {
@@ -16,6 +17,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+
+import { PERMISSIONS } from "@/lib/auth";
 
 export default function RootLayout({
   children,
@@ -50,7 +53,9 @@ export default function RootLayout({
             <PatientBreadcrumbs />
           </div>
           <div className="px-4 flex-shrink-0 flex items-center gap-2">
-            <CreatePatientModal />
+            <Can perform={PERMISSIONS.PATIENT_CREATE}>
+              <CreatePatientModal />
+            </Can>
             <ModeToggle />
           </div>
         </header>

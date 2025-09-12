@@ -21,6 +21,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Can } from "../common/can";
+import { PERMISSIONS } from "@/lib/auth";
 
 const editPatientSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -166,18 +168,26 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
         <div className="flex gap-2 transition-all duration-300 flex-shrink-0">
           {!isEditing ? (
             <>
-              <div className="transition-all duration-300 opacity-100 translate-x-0">
-                <Button onClick={handleEdit} variant="outline" size="sm">
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Edit Information
-                </Button>
-              </div>
-              <div className="transition-all duration-300 opacity-100 translate-x-0">
-                <Button onClick={handleDelete} variant="destructive" size="sm">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </Button>
-              </div>
+              <Can perform={PERMISSIONS.PATIENT_UPDATE}>
+                <div className="transition-all duration-300 opacity-100 translate-x-0">
+                  <Button onClick={handleEdit} variant="outline" size="sm">
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit Information
+                  </Button>
+                </div>
+              </Can>
+              <Can perform={PERMISSIONS.PATIENT_DELETE}>
+                <div className="transition-all duration-300 opacity-100 translate-x-0">
+                  <Button
+                    onClick={handleDelete}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </Can>
             </>
           ) : (
             <>

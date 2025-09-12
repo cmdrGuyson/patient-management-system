@@ -24,6 +24,8 @@ import { DataTable } from "../common/data-table";
 import { Patient } from "@/types";
 
 import patientData from "@/app/(dashboard)/patients/data.json";
+import { Can } from "../common/can";
+import { PERMISSIONS } from "@/lib/auth";
 
 const data: Patient[] = patientData;
 
@@ -210,13 +212,19 @@ export const columns: ColumnDef<Patient>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleViewDetails}>
-                View patient details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleEditPatient}>
-                Edit patient
-              </DropdownMenuItem>
-              <DropdownMenuItem>Delete patient</DropdownMenuItem>
+              <Can perform={PERMISSIONS.PATIENT_VIEW}>
+                <DropdownMenuItem onClick={handleViewDetails}>
+                  View patient details
+                </DropdownMenuItem>
+              </Can>
+              <Can perform={PERMISSIONS.PATIENT_UPDATE}>
+                <DropdownMenuItem onClick={handleEditPatient}>
+                  Edit patient
+                </DropdownMenuItem>
+              </Can>
+              <Can perform={PERMISSIONS.PATIENT_DELETE}>
+                <DropdownMenuItem>Delete patient</DropdownMenuItem>
+              </Can>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

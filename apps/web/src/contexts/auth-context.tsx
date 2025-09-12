@@ -9,12 +9,12 @@ import React, {
 } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
-import { isTokenExpired } from "@/lib/auth";
+import { getPermissionsForRole, isTokenExpired, Role } from "@/lib/auth";
 
 interface User {
   id: number;
   email: string;
-  role: string;
+  role: Role;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,14 +26,20 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   refreshUser: () => Promise<void>;
+  hasPermission: (permission: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const EMPTY_PERMISSIONS = new Set<string>();
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [permissions, setPermissions] =
+    useState<Set<string>>(EMPTY_PERMISSIONS);
+
   const router = useRouter();
 
   const refreshUser = useCallback(async (): Promise<void> => {
@@ -45,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await api.get("/auth/profile");
       setUser(response.data);
+      setPermissions(getPermissionsForRole(response.data.role));
     } catch (error: unknown) {
       console.error("Failed to fetch user profile:", error);
       setUser(null);
@@ -55,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (axiosError.response?.status === 401) {
           setToken(null);
           localStorage.removeItem("token");
+          setPermissions(EMPTY_PERMISSIONS);
         }
       }
     }
@@ -75,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(null);
       localStorage.removeItem("token");
       setUser(null);
+      setPermissions(EMPTY_PERMISSIONS);
     }
     setIsLoading(false);
   }, [token, refreshUser]);
@@ -90,6 +99,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     localStorage.removeItem("token");
     router.push("/login");
+    setPermissions(EMPTY_PERMISSIONS);
+  };
+
+  const hasPermission = (permission: string): boolean => {
+    return permissions.has(permission);
   };
 
   return (
@@ -101,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         isLoading,
         refreshUser,
+        hasPermission,
       }}
     >
       {children}
