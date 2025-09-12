@@ -25,6 +25,7 @@ import { Can } from "../common/can";
 import { PERMISSIONS } from "@/lib/auth";
 import { usePatients, useUpdatePatient } from "@/hooks/use-patients";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/auth-context";
 
 const buildEditPatientSchema = (patients: Patient[] = [], currentId?: number) =>
   z.object({
@@ -81,8 +82,10 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
   const searchParams = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
   const { data: patients = [] } = usePatients();
   const updatePatient = useUpdatePatient();
+  const { hasPermission } = useAuth();
 
   const schema = useMemo(
     () => buildEditPatientSchema(patients, patient.id),
@@ -112,11 +115,14 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
   const watchedValues = watch();
 
   useEffect(() => {
+    if (!hasPermission(PERMISSIONS.PATIENT_UPDATE)) {
+      return;
+    }
     const editMode = searchParams.get("edit");
     if (editMode === "true") {
       setIsEditing(true);
     }
-  }, [searchParams]);
+  }, [searchParams, hasPermission]);
 
   const handleEdit = () => {
     setIsEditing(true);
