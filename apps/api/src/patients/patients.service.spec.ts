@@ -2,7 +2,6 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { PatientsService } from "./patients.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { Patient } from "@prisma/client";
-import { NotFoundException } from "@nestjs/common";
 import { CreatePatientDto } from "./dto/create-patient.dto";
 import { UpdatePatientDto } from "./dto/update-patient.dto";
 
@@ -136,21 +135,6 @@ describe("PatientsService", () => {
         where: { id: 1 },
       });
       expect(result).toEqual(mockPatient);
-    });
-
-    it("should throw NotFoundException when patient not found", async () => {
-      const findUniqueSpy = jest
-        .spyOn(prismaService.patient, "findUnique")
-        .mockResolvedValue(null);
-
-      await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(999)).rejects.toThrow(
-        "Patient with ID 999 not found",
-      );
-
-      expect(findUniqueSpy).toHaveBeenCalledWith({
-        where: { id: 999 },
-      });
     });
   });
 

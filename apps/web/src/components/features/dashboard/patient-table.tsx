@@ -23,11 +23,10 @@ import {
 import { DataTable } from "../common/data-table";
 import { Patient } from "@/types";
 
-import patientData from "@/app/(dashboard)/patients/data.json";
 import { Can } from "../common/can";
 import { PERMISSIONS } from "@/lib/auth";
-
-const data: Patient[] = patientData;
+import { usePatients } from "@/hooks/use-patients";
+import { DataTableSkeleton } from "../common/data-table-skeleton";
 
 // Helper function to get the appropriate sort icon
 const getSortIcon = (column: Column<Patient>) => {
@@ -234,10 +233,15 @@ export const columns: ColumnDef<Patient>[] = [
 ];
 
 export function PatientTable() {
+  const { data, isLoading } = usePatients();
+
+  if (isLoading)
+    return <DataTableSkeleton columns={columns.length} rows={10} />;
+
   return (
     <DataTable
       columns={columns}
-      data={data}
+      data={data || []}
       filterableColumns={["firstName", "lastName", "email", "phoneNumber"]}
     />
   );

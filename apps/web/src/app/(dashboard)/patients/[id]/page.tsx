@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
 
-import patients from "@/app/(dashboard)/patients/data.json";
 import PatientDetails from "@/components/features/dashboard/patient-details";
+import PatientDetailsSkeleton from "@/components/features/dashboard/patient-details-skeleton";
+import { usePatient } from "@/hooks/use-patients";
 
 interface PatientDetailsPageProps {
   params: Promise<{
@@ -20,8 +21,11 @@ export default function PatientDetailsPage({
   const router = useRouter();
   const resolvedParams = use(params);
 
-  // TODO: Fetch via API
-  const patient = patients.find((p) => p.id.toString() === resolvedParams.id);
+  const { data: patient, isLoading } = usePatient(+resolvedParams.id);
+
+  if (isLoading) {
+    return <PatientDetailsSkeleton />;
+  }
 
   // If patient is not found
   if (!patient) {

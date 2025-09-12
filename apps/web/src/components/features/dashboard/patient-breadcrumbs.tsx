@@ -9,19 +9,22 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import patients from "@/app/(dashboard)/patients/data.json";
+
 import { Patient } from "@/types";
+import { usePatients } from "@/hooks/use-patients";
 
 export function PatientBreadcrumbs() {
   const pathname = usePathname();
   const isPatientDetails =
     pathname.includes("/patients/") && pathname !== "/patients";
 
+  const { data: patients } = usePatients();
+
   // Get patient ID from pathname
   let patient: Patient | undefined;
   if (isPatientDetails) {
     const patientId = pathname.split("/patients/")[1];
-    patient = patients.find((p) => p.id.toString() === patientId);
+    patient = patients?.find((p) => p.id.toString() === patientId);
   }
 
   return (

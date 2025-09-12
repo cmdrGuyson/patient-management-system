@@ -10,6 +10,7 @@ import React, {
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { getPermissionsForRole, isTokenExpired, Role } from "@/lib/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface User {
   id: number;
@@ -41,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useState<Set<string>>(EMPTY_PERMISSIONS);
 
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const refreshUser = useCallback(async (): Promise<void> => {
     if (!token || isTokenExpired(token)) {
@@ -63,10 +65,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setToken(null);
           localStorage.removeItem("token");
           setPermissions(EMPTY_PERMISSIONS);
+          queryClient.clear();
         }
       }
     }
-  }, [token]);
+  }, [token, queryClient]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -84,9 +87,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("token");
       setUser(null);
       setPermissions(EMPTY_PERMISSIONS);
+      queryClient.clear();
     }
     setIsLoading(false);
-  }, [token, refreshUser]);
+  }, [token, refreshUser, queryClient]);
 
   const login = (newToken: string) => {
     setToken(newToken);
@@ -100,6 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("token");
     router.push("/login");
     setPermissions(EMPTY_PERMISSIONS);
+    queryClient.clear();
   };
 
   const hasPermission = (permission: string): boolean => {
