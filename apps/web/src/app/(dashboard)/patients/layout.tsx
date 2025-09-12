@@ -1,4 +1,11 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+
 import { ModeToggle } from "@/components/features/common/mode-toggle";
+import FullScreenLoader from "@/components/features/common/full-screen-loader";
 import { AppSidebar } from "@/components/features/dashboard/app-sidebar";
 import { PatientBreadcrumbs } from "@/components/features/dashboard/patient-breadcrumbs";
 import { CreatePatientModal } from "@/components/features/dashboard/create-patient-modal";
@@ -15,6 +22,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { token, isLoading, user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!token) {
+      router.replace("/login");
+    }
+  }, [token, isLoading, router]);
+
+  if (isLoading || !user) {
+    return <FullScreenLoader />;
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

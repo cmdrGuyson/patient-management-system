@@ -1,0 +1,117 @@
+"use client";
+
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { useRouter } from "next/navigation";
+import api from "@/lib/api";
+import { isTokenExpired } from "@/lib/auth";
+
+interface User {
+  id: number;
+  email: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface AuthContextType {
+  token: string | null;
+  user: User | null;
+  login: (token: string) => void;
+  logout: () => void;
+  isLoading: boolean;
+  refreshUser: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  const refreshUser = useCallback(async (): Promise<void> => {
+    if (!token || isTokenExpired(token)) {
+      setUser(null);
+      return;
+    }
+
+    try {
+      const response = await api.get("/auth/profile");
+      setUser(response.data);
+    } catch (error: unknown) {
+      console.error("Failed to fetch user profile:", error);
+      setUser(null);
+
+      // Clear token if invalid
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 401) {
+          setToken(null);
+          localStorage.removeItem("token");
+        }
+      }
+    }
+  }, [token]);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
+
+  // Fetch user profile when token changes
+  useEffect(() => {
+    if (token && !isTokenExpired(token)) {
+      refreshUser();
+    } else if (token && isTokenExpired(token)) {
+      setToken(null);
+      localStorage.removeItem("token");
+      setUser(null);
+    }
+    setIsLoading(false);
+  }, [token, refreshUser]);
+
+  const login = (newToken: string) => {
+    setToken(newToken);
+    localStorage.setItem("token", newToken);
+    router.push("/patients");
+  };
+
+  const logout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        login,
+        logout,
+        isLoading,
+        refreshUser,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
