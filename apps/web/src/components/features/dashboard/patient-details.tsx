@@ -87,12 +87,12 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
   const currentData = isEditing && editedPatient ? editedPatient : patient;
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-6 transition-all duration-300">
+    <div className="flex flex-1 flex-col gap-6 p-6 transition-all duration-300 min-w-0 overflow-hidden">
       {/* Header with action buttons */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 min-w-0">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-3 min-w-0">
+            <h1 className="text-3xl font-bold tracking-tight truncate">
               {patient.firstName} {patient.lastName}
             </h1>
             <span
@@ -107,7 +107,7 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
           </div>
           <p className="text-muted-foreground">Patient Details</p>
         </div>
-        <div className="flex gap-2 transition-all duration-300">
+        <div className="flex gap-2 transition-all duration-300 flex-shrink-0">
           {!isEditing ? (
             <>
               <div className="transition-all duration-300 opacity-100 translate-x-0">
@@ -143,7 +143,7 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
       </div>
 
       {/* Patient Information Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-w-0">
         {/* Basic Information */}
         <Card className="transition-all duration-300">
           <CardHeader>

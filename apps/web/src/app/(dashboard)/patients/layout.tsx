@@ -17,9 +17,9 @@ export default function RootLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="overflow-hidden">
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex items-center gap-2 px-4 min-w-0">
             <SidebarTrigger className="-ml-1" />
             <Separator
               orientation="vertical"
@@ -27,11 +27,11 @@ export default function RootLayout({
             />
             <PatientBreadcrumbs />
           </div>
-          <div className="px-4">
+          <div className="px-4 flex-shrink-0">
             <ModeToggle />
           </div>
         </header>
-        {children}
+        <div className="flex-1 overflow-auto">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
