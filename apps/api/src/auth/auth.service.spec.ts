@@ -6,7 +6,6 @@ import { UsersService } from "../users/users.service";
 import { User, Role } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 
-// Mock bcrypt
 jest.mock("bcrypt");
 const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
