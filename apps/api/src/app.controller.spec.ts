@@ -15,8 +15,9 @@ describe("AppController", () => {
   });
 
   describe("root", () => {
-    it("should return 'Hello World!'", () => {
-      expect(appController.getHello()).toBe("Hello World!");
+    it("should return sucess result", () => {
+      const result = appController.pingForHealth();
+      expect(result).toStrictEqual({ success: true });
     });
   });
 });

@@ -11,8 +11,8 @@ import {
 import { PatientsService } from "./patients.service";
 import { CreatePatientDto } from "./dto/create-patient.dto";
 import { UpdatePatientDto } from "./dto/update-patient.dto";
-import { RolesGuard } from "src/auth/roles.guard";
-import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { RolesGuard } from "../auth/roles.guard";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Roles } from "../auth/roles.decorator";
 import { Role } from "@prisma/client";
 
