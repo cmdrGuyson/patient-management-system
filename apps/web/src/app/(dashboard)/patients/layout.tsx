@@ -1,14 +1,6 @@
 import { ModeToggle } from "@/components/features/common/mode-toggle";
 import { AppSidebar } from "@/components/features/dashboard/app-sidebar";
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { PatientBreadcrumbs } from "@/components/features/dashboard/patient-breadcrumbs";
 
 import { Separator } from "@/components/ui/separator";
 import {
@@ -33,19 +25,7 @@ export default function RootLayout({
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Patient Management System
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Patients</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <PatientBreadcrumbs />
           </div>
           <div className="px-4">
             <ModeToggle />

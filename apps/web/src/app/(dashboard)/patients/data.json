@@ -6,6 +6,7 @@
     "email": "john.smith@email.com",
     "phoneNumber": "+1-555-0101",
     "dob": "1985-03-15",
+    "additionalInformation": "Patient has a history of hypertension and is currently on medication. Regular monitoring of blood pressure required. Allergic to penicillin. Last physical examination showed good overall health with minor cholesterol concerns. Recommended to maintain current exercise routine and dietary restrictions.",
     "createdAt": "2024-01-15T09:30:00Z",
     "updatedAt": "2024-01-15T09:30:00Z"
   },
@@ -16,6 +17,7 @@
     "email": "sarah.johnson@email.com",
     "phoneNumber": "+1-555-0102",
     "dob": "1990-07-22",
+    "additionalInformation": "Recent patient with no significant medical history. Initial consultation completed successfully. Patient is interested in preventive care and annual checkups. No known allergies. Family history includes diabetes on maternal side - monitoring recommended.",
     "createdAt": "2024-01-16T10:15:00Z",
     "updatedAt": "2024-01-16T10:15:00Z"
   },
@@ -26,6 +28,7 @@
     "email": "michael.brown@email.com",
     "phoneNumber": "+1-555-0103",
     "dob": "1978-11-08",
+    "additionalInformation": "Long-term patient with chronic back pain management. Currently undergoing physical therapy sessions twice weekly. Previous MRI showed mild disc degeneration at L4-L5. Patient reports improvement with current treatment plan. Regular follow-ups scheduled for pain management assessment.",
     "createdAt": "2024-01-17T14:20:00Z",
     "updatedAt": "2024-01-17T14:20:00Z"
   },
@@ -46,6 +49,7 @@
     "email": "david.wilson@email.com",
     "phoneNumber": "+1-555-0105",
     "dob": "1983-09-30",
+    "additionalInformation": "Patient with seasonal allergies and mild asthma. Uses inhaler as needed during allergy season. Last pulmonary function test was normal. Patient is very compliant with medication regimen and follows environmental triggers avoidance recommendations.",
     "createdAt": "2024-01-19T08:30:00Z",
     "updatedAt": "2024-01-19T08:30:00Z"
   },
@@ -66,6 +70,7 @@
     "email": "robert.taylor@email.com",
     "phoneNumber": "+1-555-0107",
     "dob": "1975-04-18",
+    "additionalInformation": "Senior patient with multiple comorbidities including diabetes type 2, hypertension, and early stage kidney disease. Requires regular monitoring of blood glucose, blood pressure, and kidney function. Patient is very engaged in self-care and follows dietary recommendations closely.",
     "createdAt": "2024-01-21T16:00:00Z",
     "updatedAt": "2024-01-21T16:00:00Z"
   },
@@ -86,6 +91,7 @@
     "email": "christopher.jackson@email.com",
     "phoneNumber": "+1-555-0109",
     "dob": "1986-01-14",
+    "additionalInformation": "Patient recovering from recent sports injury (torn ACL). Post-surgical rehabilitation in progress. Physical therapy sessions three times weekly. Patient is highly motivated and following recovery protocol diligently. Expected full recovery within 6-8 months.",
     "createdAt": "2024-01-23T12:30:00Z",
     "updatedAt": "2024-01-23T12:30:00Z"
   },
@@ -106,6 +112,7 @@
     "email": "james.harris@email.com",
     "phoneNumber": "+1-555-0111",
     "dob": "1982-10-11",
+    "additionalInformation": "Patient with anxiety disorder and mild depression. Currently in therapy and on medication. Regular psychiatric follow-ups scheduled. Patient reports good response to current treatment plan. Family support system is strong and actively involved in care.",
     "createdAt": "2024-01-25T10:10:00Z",
     "updatedAt": "2024-01-25T10:10:00Z"
   },
@@ -126,6 +133,7 @@
     "email": "daniel.thompson@email.com",
     "phoneNumber": "+1-555-0113",
     "dob": "1980-12-16",
+    "additionalInformation": "Patient with sleep apnea using CPAP machine. Recent sleep study showed significant improvement with current pressure settings. Patient reports better sleep quality and daytime energy levels. Regular follow-ups to monitor compliance and effectiveness of treatment.",
     "createdAt": "2024-01-27T11:25:00Z",
     "updatedAt": "2024-01-27T11:25:00Z"
   },
@@ -146,6 +154,7 @@
     "email": "matthew.martinez@email.com",
     "phoneNumber": "+1-555-0115",
     "dob": "1984-03-21",
+    "additionalInformation": "Patient with recurring migraines. Currently on preventive medication with good response. Patient has identified several triggers including stress and certain foods. Regular follow-ups to adjust medication as needed. Patient maintains detailed headache diary for better treatment planning.",
     "createdAt": "2024-01-29T09:15:00Z",
     "updatedAt": "2024-01-29T09:15:00Z"
   },
@@ -166,6 +175,7 @@
     "email": "andrew.clark@email.com",
     "phoneNumber": "+1-555-0117",
     "dob": "1979-05-26",
+    "additionalInformation": "Patient with heart condition (atrial fibrillation). On blood thinners and regular cardiac monitoring. Patient is very compliant with medication and lifestyle modifications. Regular cardiology follow-ups scheduled. No recent episodes reported, condition well-controlled.",
     "createdAt": "2024-01-31T12:05:00Z",
     "updatedAt": "2024-01-31T12:05:00Z"
   },
@@ -186,6 +196,7 @@
     "email": "kevin.lewis@email.com",
     "phoneNumber": "+1-555-0119",
     "dob": "1981-08-17",
+    "additionalInformation": "Patient with chronic kidney stones. Multiple episodes in past two years. Currently on dietary modifications and increased fluid intake. Regular urology follow-ups. Patient is very motivated to prevent recurrence and follows all dietary recommendations strictly.",
     "createdAt": "2024-02-02T10:55:00Z",
     "updatedAt": "2024-02-02T10:55:00Z"
   },

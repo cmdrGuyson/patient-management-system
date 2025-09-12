@@ -123,16 +123,9 @@ export function DataTable<T>({ columns, data, filterableColumns }: Props<T>) {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" className="ml-auto">
-                  Columns <ChevronDown />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Toggle column visibility</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button variant="outline" className="ml-auto">
+              Columns <ChevronDown />
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {table

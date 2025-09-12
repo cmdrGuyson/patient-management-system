@@ -2,8 +2,15 @@
 
 import * as React from "react";
 import { Column, ColumnDef } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
 
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal } from "lucide-react";
+import {
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  MoreHorizontal,
+  Eye,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -185,24 +192,38 @@ export const columns: ColumnDef<Patient>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const patient = row.original;
+      const router = useRouter();
+
+      const handleViewDetails = () => {
+        router.push(`/patients/${patient.id}`);
+      };
+
+      const handleEditPatient = () => {
+        router.push(`/patients/${patient.id}?edit=true`);
+      };
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View patient details</DropdownMenuItem>
-            <DropdownMenuItem>Edit patient</DropdownMenuItem>
-            <DropdownMenuItem>Delete patient</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleViewDetails}>
+                View patient details
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleEditPatient}>
+                Edit patient
+              </DropdownMenuItem>
+              <DropdownMenuItem>Delete patient</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   },
