@@ -16,14 +16,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useAuth } from "@/contexts/auth-context";
 
 const data = {
-  user: {
-    name: "Gayanga Kuruppu",
-    email: "gayanga@email.com",
-    avatar:
-      "https://ui-avatars.com/api/?background=0D8ABC&name=Gayanga+Kuruppu",
-  },
   navMain: [
     {
       title: "Patients",
@@ -39,6 +34,12 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -64,7 +65,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={{
+            name: user.role === "ADMIN" ? "Admin User" : "General User",
+            email: user.email,
+          }}
+        />
       </SidebarFooter>
     </Sidebar>
   );
