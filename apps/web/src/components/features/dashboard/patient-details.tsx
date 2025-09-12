@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,20 +23,54 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Can } from "../common/can";
 import { PERMISSIONS } from "@/lib/auth";
+import { usePatients, useUpdatePatient } from "@/hooks/use-patients";
+import { toast } from "sonner";
 
-const editPatientSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
-  dob: z.string().min(1, "Date of birth is required"),
-  additionalInformation: z.string().optional(),
-});
+const buildEditPatientSchema = (patients: Patient[] = [], currentId?: number) =>
+  z.object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address")
+      .refine(
+        (value) => {
+          if (!value || patients.length === 0) return true;
+          const lower = value.toLowerCase();
+          return !patients.some(
+            (p) => p.id !== currentId && p.email.toLowerCase() === lower
+          );
+        },
+        { message: "Email already exists" }
+      ),
+    phoneNumber: z
+      .string()
+      .min(1, "Phone number is required")
+      .refine(
+        (value) => {
+          if (!/^\+?[\d\s\-\(\)]+$/.test(value)) return false;
+          const normalized = value.replace(/[^\d+]/g, "");
+          const digits = normalized.startsWith("+")
+            ? normalized.slice(1)
+            : normalized;
+          return /^[1-9]\d{7,14}$/.test(digits);
+        },
+        {
+          message:
+            "Please enter a valid phone number (8–15 digits, optional +).",
+        }
+      ),
+    dob: z
+      .string()
+      .min(1, "Date of birth is required")
+      .refine((val) => !Number.isNaN(Date.parse(val)), {
+        message: "Date of birth must be a valid date",
+      }),
+    additionalInformation: z.string().optional(),
+  });
 
-type EditPatientFormData = z.infer<typeof editPatientSchema>;
+type EditPatientFormData = z.infer<ReturnType<typeof buildEditPatientSchema>>;
 
 interface PatientDetailsProps {
   patient: Patient;
@@ -47,6 +81,13 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
   const searchParams = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const { data: patients = [] } = usePatients();
+  const updatePatient = useUpdatePatient();
+
+  const schema = useMemo(
+    () => buildEditPatientSchema(patients, patient.id),
+    [patients, patient.id]
+  );
 
   const {
     register,
@@ -56,7 +97,8 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
     setValue,
     watch,
   } = useForm<EditPatientFormData>({
-    resolver: zodResolver(editPatientSchema),
+    resolver: zodResolver(schema),
+    mode: "onChange",
     defaultValues: {
       firstName: patient.firstName,
       lastName: patient.lastName,
@@ -69,7 +111,6 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
 
   const watchedValues = watch();
 
-  // Check for edit mode query parameter on component mount
   useEffect(() => {
     const editMode = searchParams.get("edit");
     if (editMode === "true") {
@@ -110,14 +151,32 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
   };
 
   const onFormSubmit = (data: EditPatientFormData) => {
-    // TODO: Implement this - integrate with API
-    console.log("Saving patient:", data);
-    setIsEditing(false);
+    const payload = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+      dob: data.dob,
+      additionalInformation: data.additionalInformation || undefined,
+    };
 
-    // Remove edit mode from URL
-    const url = new URL(window.location.href);
-    url.searchParams.delete("edit");
-    router.replace(url.pathname + url.search);
+    updatePatient.mutate(
+      { id: patient.id, updates: payload },
+      {
+        onSuccess: () => {
+          toast.success("Patient updated successfully");
+          setIsEditing(false);
+
+          const url = new URL(window.location.href);
+          url.searchParams.delete("edit");
+          router.replace(url.pathname + url.search);
+        },
+        onError: (error) => {
+          console.error("Failed to update patient", error);
+          toast.error("Failed to update patient");
+        },
+      }
+    );
   };
 
   const handleDelete = () => {
@@ -195,10 +254,12 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
                 <Button
                   onClick={handleSubmit(onFormSubmit)}
                   size="sm"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || updatePatient.isPending}
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {isSubmitting ? "Saving..." : "Save Changes"}
+                  {isSubmitting || updatePatient.isPending
+                    ? "Saving..."
+                    : "Save Changes"}
                 </Button>
               </div>
               <div className="transition-all duration-300 opacity-100 translate-x-0">

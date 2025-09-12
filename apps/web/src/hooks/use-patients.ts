@@ -74,10 +74,14 @@ export const useCreatePatient = () => {
         updatedAt: new Date().toISOString(),
       };
 
+      // Optimistically update list cache
       queryClient.setQueryData<Patient[]>(["patients"], (old) => {
         const current = old || [];
         return [...current, optimisticPatient];
       });
+
+      // Optimistically update single cache
+      queryClient.setQueryData(["patient", optimisticId], optimisticPatient);
 
       return { previousPatients, optimisticId } as {
         previousPatients: Patient[];
@@ -91,13 +95,14 @@ export const useCreatePatient = () => {
     },
     onSuccess: (created, _variables, context) => {
       if (context) {
+        // Replace caches with the server result
         queryClient.setQueryData<Patient[] | undefined>(
           ["patients"],
           (old) =>
             old?.map((p) => (p.id === context.optimisticId ? created : p)) ||
             old
         );
-        // Prime the single-patient cache with the created entity
+
         queryClient.setQueryData(["patient", created.id], created);
 
         // Clear the optimistic single-patient cache if present
@@ -107,8 +112,100 @@ export const useCreatePatient = () => {
         });
       }
     },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["patients"] });
+    onSettled: async (data) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["patients"] }),
+        data?.id
+          ? queryClient.invalidateQueries({ queryKey: ["patient", data.id] })
+          : Promise.resolve(),
+      ]);
+    },
+  });
+};
+
+type UpdatePatientInput = Partial<
+  Omit<Patient, "id" | "createdAt" | "updatedAt">
+>;
+
+export const useUpdatePatient = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    Patient,
+    unknown,
+    { id: number; updates: UpdatePatientInput },
+    { previousPatients: Patient[]; previousPatient?: Patient }
+  >({
+    mutationFn: async ({ id, updates }) => {
+      const { data } = await api.patch(`/patients/${id}`, updates);
+      return data;
+    },
+    onMutate: async ({ id, updates }) => {
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["patients"] }),
+        queryClient.cancelQueries({ queryKey: ["patient", id] }),
+      ]);
+
+      const previousPatients =
+        queryClient.getQueryData<Patient[]>(["patients"]) || [];
+      const previousPatient = queryClient.getQueryData<Patient>([
+        "patient",
+        id,
+      ]);
+
+      // Optimistically update list cache
+      queryClient.setQueryData<Patient[] | undefined>(["patients"], (old) => {
+        if (!old) return old;
+        return old.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                ...updates,
+                updatedAt: new Date().toISOString(),
+              }
+            : p
+        );
+      });
+
+      // Optimistically update single cache
+      queryClient.setQueryData<Patient | undefined>(["patient", id], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        };
+      });
+
+      return { previousPatients, previousPatient };
+    },
+    onError: (_err, variables, context) => {
+      if (!context) return;
+      queryClient.setQueryData(["patients"], context.previousPatients);
+      if (variables?.id && context.previousPatient) {
+        queryClient.setQueryData(
+          ["patient", variables.id],
+          context.previousPatient
+        );
+      }
+    },
+    onSuccess: (updated) => {
+      // Replace caches with the server result
+      queryClient.setQueryData<Patient[] | undefined>(
+        ["patients"],
+        (old) => old?.map((p) => (p.id === updated.id ? updated : p)) || old
+      );
+      queryClient.setQueryData(["patient", updated.id], updated);
+    },
+    onSettled: async (_data, _error, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["patients"] }),
+        variables?.id
+          ? queryClient.invalidateQueries({
+              queryKey: ["patient", variables.id],
+            })
+          : Promise.resolve(),
+      ]);
     },
   });
 };

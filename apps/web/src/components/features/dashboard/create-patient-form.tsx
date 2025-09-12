@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { usePatients } from "@/hooks/use-patients";
 
-const createPatientSchema = (patients: Patient[] = []) =>
+const buildCreatePatientSchema = (patients: Patient[] = []) =>
   z.object({
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
@@ -92,6 +92,10 @@ export function CreatePatientForm({
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const { data: patients = [] } = usePatients();
 
+  const schema = useMemo(() => {
+    return buildCreatePatientSchema(patients);
+  }, [patients]);
+
   const {
     register,
     handleSubmit,
@@ -100,7 +104,7 @@ export function CreatePatientForm({
     setValue,
     watch,
   } = useForm<CreatePatientFormData>({
-    resolver: zodResolver(createPatientSchema(patients)),
+    resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
       firstName: "",
