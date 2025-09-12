@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ColumnDef } from "@tanstack/react-table";
+import { Column, ColumnDef } from "@tanstack/react-table";
 
 import { ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal } from "lucide-react";
 
@@ -14,6 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { DataTable } from "../common/data-table";
 import { Patient } from "@/types";
 
@@ -22,7 +27,7 @@ import patientData from "@/app/(dashboard)/patients/data.json";
 const data: Patient[] = patientData;
 
 // Helper function to get the appropriate sort icon
-const getSortIcon = (column: any) => {
+const getSortIcon = (column: Column<Patient>) => {
   const sortDirection = column.getIsSorted();
   if (sortDirection === "asc") return <ArrowUp className="ml-2 h-4 w-4" />;
   if (sortDirection === "desc") return <ArrowDown className="ml-2 h-4 w-4" />;
@@ -34,13 +39,22 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: "firstName",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          First Name
-          {getSortIcon(column)}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              First Name
+              {getSortIcon(column)}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Sort by first name</p>
+          </TooltipContent>
+        </Tooltip>
       );
     },
     cell: ({ row }) => (
@@ -51,13 +65,22 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: "lastName",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Last Name
-          {getSortIcon(column)}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Last Name
+              {getSortIcon(column)}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Sort by last name</p>
+          </TooltipContent>
+        </Tooltip>
       );
     },
     cell: ({ row }) => (
@@ -68,13 +91,22 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: "email",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          {getSortIcon(column)}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Email
+              {getSortIcon(column)}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Sort by email</p>
+          </TooltipContent>
+        </Tooltip>
       );
     },
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
@@ -88,13 +120,22 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: "dob",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date of Birth
-          {getSortIcon(column)}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Date of Birth
+              {getSortIcon(column)}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Sort by date of birth</p>
+          </TooltipContent>
+        </Tooltip>
       );
     },
     cell: ({ row }) => {
@@ -111,13 +152,22 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: "createdAt",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Created
-          {getSortIcon(column)}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Created
+              {getSortIcon(column)}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Sort by creation date</p>
+          </TooltipContent>
+        </Tooltip>
       );
     },
     cell: ({ row }) => {
