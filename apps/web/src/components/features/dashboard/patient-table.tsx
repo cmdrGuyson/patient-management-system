@@ -25,8 +25,10 @@ import { Patient } from "@/types";
 
 import { Can } from "../common/can";
 import { PERMISSIONS } from "@/lib/auth";
-import { usePatients } from "@/hooks/use-patients";
+import { usePatients, useDeletePatient } from "@/hooks/use-patients";
 import { DataTableSkeleton } from "../common/data-table-skeleton";
+import { ConfirmAction } from "../common/confirm-action";
+import { toast } from "sonner";
 
 // Helper function to get the appropriate sort icon
 const getSortIcon = (column: Column<Patient>) => {
@@ -190,6 +192,8 @@ export const columns: ColumnDef<Patient>[] = [
 
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const router = useRouter();
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const deletePatient = useDeletePatient();
 
       const handleViewDetails = () => {
         router.push(`/patients/${patient.id}`);
@@ -197,6 +201,17 @@ export const columns: ColumnDef<Patient>[] = [
 
       const handleEditPatient = () => {
         router.push(`/patients/${patient.id}?edit=true`);
+      };
+
+      const handleDelete = async () => {
+        try {
+          await deletePatient.mutateAsync({ id: patient.id });
+          toast.success("Patient deleted successfully");
+        } catch (error) {
+          console.error("Failed to delete patient", error);
+          toast.error("Failed to delete patient");
+          throw error;
+        }
       };
 
       return (
@@ -222,7 +237,17 @@ export const columns: ColumnDef<Patient>[] = [
                 </DropdownMenuItem>
               </Can>
               <Can perform={PERMISSIONS.PATIENT_DELETE}>
-                <DropdownMenuItem>Delete patient</DropdownMenuItem>
+                <ConfirmAction
+                  title="Delete patient"
+                  description="Are you sure you want to delete this patient? This action cannot be undone."
+                  confirmText="Delete"
+                  destructive
+                  onConfirm={handleDelete}
+                >
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    Delete patient
+                  </DropdownMenuItem>
+                </ConfirmAction>
               </Can>
             </DropdownMenuContent>
           </DropdownMenu>

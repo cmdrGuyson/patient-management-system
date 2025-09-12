@@ -209,3 +209,70 @@ export const useUpdatePatient = () => {
     },
   });
 };
+
+export const useDeletePatient = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    unknown,
+    unknown,
+    { id: number },
+    { previousPatients: Patient[]; previousPatient?: Patient }
+  >({
+    mutationFn: async ({ id }) => {
+      await api.delete(`/patients/${id}`);
+    },
+    onMutate: async ({ id }) => {
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["patients"] }),
+        queryClient.cancelQueries({ queryKey: ["patient", id] }),
+      ]);
+
+      const previousPatients =
+        queryClient.getQueryData<Patient[]>(["patients"]) || [];
+      const previousPatient = queryClient.getQueryData<Patient>([
+        "patient",
+        id,
+      ]);
+
+      // Optimistically remove from list cache
+      queryClient.setQueryData<Patient[] | undefined>(["patients"], (old) =>
+        old ? old.filter((p) => p.id !== id) : old
+      );
+
+      // Optimistically clear single cache
+      queryClient.setQueryData<Patient | undefined>(["patient", id], undefined);
+
+      return { previousPatients, previousPatient };
+    },
+    onError: (_err, variables, context) => {
+      if (!context) return;
+      queryClient.setQueryData(["patients"], context.previousPatients);
+      if (variables?.id && context.previousPatient) {
+        queryClient.setQueryData(
+          ["patient", variables.id],
+          context.previousPatient
+        );
+      }
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData<Patient[] | undefined>(["patients"], (old) =>
+        old ? old.filter((p) => p.id !== variables.id) : old
+      );
+      queryClient.removeQueries({
+        queryKey: ["patient", variables.id],
+        exact: true,
+      });
+    },
+    onSettled: async (_data, _error, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["patients"] }),
+        variables?.id
+          ? queryClient.invalidateQueries({
+              queryKey: ["patient", variables.id],
+            })
+          : Promise.resolve(),
+      ]);
+    },
+  });
+};

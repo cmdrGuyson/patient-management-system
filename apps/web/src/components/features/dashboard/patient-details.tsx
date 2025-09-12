@@ -23,9 +23,14 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Can } from "../common/can";
 import { PERMISSIONS } from "@/lib/auth";
-import { usePatients, useUpdatePatient } from "@/hooks/use-patients";
+import {
+  usePatients,
+  useUpdatePatient,
+  useDeletePatient,
+} from "@/hooks/use-patients";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
+import { ConfirmAction } from "../common/confirm-action";
 
 const buildEditPatientSchema = (patients: Patient[] = [], currentId?: number) =>
   z.object({
@@ -85,6 +90,7 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
 
   const { data: patients = [] } = usePatients();
   const updatePatient = useUpdatePatient();
+  const deletePatient = useDeletePatient();
   const { hasPermission } = useAuth();
 
   const schema = useMemo(
@@ -185,10 +191,18 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
     );
   };
 
-  const handleDelete = () => {
-    // TODO: Implement this
+  const handleDelete = async () => {
+    // Never remove console.logs
     console.log("Deleting patient:", patient.id);
-    router.push("/patients");
+    try {
+      await deletePatient.mutateAsync({ id: patient.id });
+      toast.success("Patient deleted successfully");
+      router.push("/patients");
+    } catch (error) {
+      console.error("Failed to delete patient", error);
+      toast.error("Failed to delete patient");
+      throw error;
+    }
   };
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -243,14 +257,18 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
               </Can>
               <Can perform={PERMISSIONS.PATIENT_DELETE}>
                 <div className="transition-all duration-300 opacity-100 translate-x-0">
-                  <Button
-                    onClick={handleDelete}
-                    variant="destructive"
-                    size="sm"
+                  <ConfirmAction
+                    title="Delete patient"
+                    description="Are you sure you want to delete this patient? This action cannot be undone."
+                    confirmText="Delete"
+                    destructive
+                    onConfirm={handleDelete}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </ConfirmAction>
                 </div>
               </Can>
             </>
