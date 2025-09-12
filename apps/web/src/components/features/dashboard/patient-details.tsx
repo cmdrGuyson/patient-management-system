@@ -6,10 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Patient } from "@/types";
-import { Edit2, Save, X, Trash2 } from "lucide-react";
+import { Edit2, Save, X, Trash2, CalendarIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface PatientDetailsProps {
   patient: Patient;
@@ -19,6 +27,7 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const [editedPatient, setEditedPatient] = useState<Patient | undefined>(
     patient
@@ -80,8 +89,20 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
     });
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      const formattedDate = format(date, "yyyy-MM-dd");
+      handleInputChange("dob", formattedDate);
+      setIsCalendarOpen(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const formatDateForDisplay = (dateString: string) => {
+    return format(new Date(dateString), "PPP");
   };
 
   const currentData = isEditing && editedPatient ? editedPatient : patient;
@@ -245,16 +266,44 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
               </Label>
               <div className="transition-all duration-300">
                 {isEditing ? (
-                  <Input
-                    id="dob"
-                    type="date"
-                    value={currentData.dob}
-                    onChange={(e) => handleInputChange("dob", e.target.value)}
-                    className="animate-in fade-in-0 slide-in-from-top-1 duration-300"
-                  />
+                  <Popover
+                    open={isCalendarOpen}
+                    onOpenChange={setIsCalendarOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal animate-in fade-in-0 slide-in-from-top-1 duration-300",
+                          !currentData.dob && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {currentData.dob ? (
+                          formatDateForDisplay(currentData.dob)
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={
+                          currentData.dob
+                            ? new Date(currentData.dob)
+                            : undefined
+                        }
+                        onSelect={handleDateSelect}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                      />
+                    </PopoverContent>
+                  </Popover>
                 ) : (
                   <p className="text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
-                    {formatDate(currentData.dob)}
+                    {formatDateForDisplay(currentData.dob)}
                   </p>
                 )}
               </div>
