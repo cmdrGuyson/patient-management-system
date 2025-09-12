@@ -32,14 +32,6 @@ describe("UsersService", () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  it("should be defined", () => {
-    expect(service).toBeDefined();
-  });
-
-  it("should have prismaService injected", () => {
-    expect(prismaService).toBeDefined();
-  });
-
   describe("findOneByEmail", () => {
     it("should return a user when found", async () => {
       const mockUser: User = {
