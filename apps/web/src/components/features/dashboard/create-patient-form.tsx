@@ -18,20 +18,67 @@ import { PlusIcon, CalendarIcon } from "lucide-react";
 import { Patient } from "@/types";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { usePatients } from "@/hooks/use-patients";
 
-const createPatientSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
-  dob: z.string().min(1, "Date of birth is required"),
-  additionalInformation: z.string().optional(),
-});
+const createPatientSchema = (patients: Patient[] = []) =>
+  z.object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address")
+      .refine(
+        (value) => {
+          if (!value || patients.length === 0) return true;
+          return !patients.some(
+            (p) => p.email.toLowerCase() === value.toLowerCase()
+          );
+        },
+        {
+          message: "Email already exists",
+        }
+      ),
+    phoneNumber: z
+      .string()
+      .min(1, "Phone number is required")
+      .refine(
+        (value) => {
+          // Only allow digits and optional + at the start
+          if (!/^\+?[\d\s\-\(\)]+$/.test(value)) {
+            return false;
+          }
 
-type CreatePatientFormData = z.infer<typeof createPatientSchema>;
+          const normalized = value.replace(/[^\d+]/g, "");
+          const digits = normalized.startsWith("+")
+            ? normalized.slice(1)
+            : normalized;
+
+          // Must be exactly 8-15 digits, starting with 1-9
+          return /^[1-9]\d{7,14}$/.test(digits);
+        },
+        {
+          message:
+            "Please enter a valid phone number (8–15 digits, optional +).",
+        }
+      ),
+    dob: z
+      .string()
+      .min(1, "Date of birth is required")
+      .refine((val) => !Number.isNaN(Date.parse(val)), {
+        message: "Date of birth must be a valid date",
+      }),
+    additionalInformation: z.string().optional(),
+  });
+
+type CreatePatientFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  dob: string;
+  additionalInformation?: string;
+};
 
 interface CreatePatientFormProps {
   onClose: () => void;
@@ -43,6 +90,7 @@ export function CreatePatientForm({
   onSubmit,
 }: CreatePatientFormProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const { data: patients = [] } = usePatients();
 
   const {
     register,
@@ -52,7 +100,8 @@ export function CreatePatientForm({
     setValue,
     watch,
   } = useForm<CreatePatientFormData>({
-    resolver: zodResolver(createPatientSchema),
+    resolver: zodResolver(createPatientSchema(patients)),
+    mode: "onChange",
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -66,14 +115,18 @@ export function CreatePatientForm({
   const dobValue = watch("dob");
 
   const onFormSubmit = (data: CreatePatientFormData) => {
-    onSubmit(data);
+    const payload = {
+      ...data,
+      dob: data.dob,
+    };
+    onSubmit(payload);
     reset();
     onClose();
   };
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
-      const formattedDate = format(date, "yyyy-MM-dd");
+      const formattedDate = date.toISOString();
       setValue("dob", formattedDate);
       setIsCalendarOpen(false);
     }
@@ -131,6 +184,8 @@ export function CreatePatientForm({
         <Label htmlFor="phoneNumber">Phone Number *</Label>
         <Input
           id="phoneNumber"
+          type="tel"
+          inputMode="tel"
           {...register("phoneNumber")}
           placeholder="Enter phone number"
           className={errors.phoneNumber ? "border-error" : ""}
@@ -168,6 +223,7 @@ export function CreatePatientForm({
               disabled={(date) =>
                 date > new Date() || date < new Date("1900-01-01")
               }
+              captionLayout="dropdown"
             />
           </PopoverContent>
         </Popover>

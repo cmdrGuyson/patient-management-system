@@ -128,7 +128,7 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
-      const formattedDate = format(date, "yyyy-MM-dd");
+      const formattedDate = date.toISOString();
       setValue("dob", formattedDate);
       setIsCalendarOpen(false);
     }

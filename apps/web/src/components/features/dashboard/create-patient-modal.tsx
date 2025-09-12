@@ -20,17 +20,27 @@ import {
 import { CreatePatientForm } from "./create-patient-form";
 import { PlusIcon } from "lucide-react";
 import { Patient } from "@/types";
+import { useCreatePatient } from "@/hooks/use-patients";
+import { toast } from "sonner";
 
 export function CreatePatientModal() {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
+  const createPatient = useCreatePatient();
 
   const handlePatientCreate = (
     patient: Omit<Patient, "id" | "createdAt" | "updatedAt">
   ) => {
-    // TODO: Create patient - integrate with API
-    console.log("Creating patient:", patient);
-    setOpen(false);
+    createPatient.mutate(patient, {
+      onSuccess: () => {
+        toast.success("Patient created successfully");
+        setOpen(false);
+      },
+      onError: (error) => {
+        console.error("Failed to create patient", error);
+        toast.error("Failed to create patient");
+      },
+    });
   };
 
   const handleClose = () => {
