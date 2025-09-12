@@ -21,9 +21,7 @@ import { CreatePatientForm } from "./create-patient-form";
 import { PlusIcon } from "lucide-react";
 import { Patient } from "@/types";
 
-interface CreatePatientModalProps {}
-
-export function CreatePatientModal({}: CreatePatientModalProps) {
+export function CreatePatientModal() {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
 

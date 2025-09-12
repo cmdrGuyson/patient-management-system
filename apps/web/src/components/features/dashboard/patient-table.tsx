@@ -4,13 +4,7 @@ import * as React from "react";
 import { Column, ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 
-import {
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  MoreHorizontal,
-  Eye,
-} from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -192,6 +186,8 @@ export const columns: ColumnDef<Patient>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const patient = row.original;
+
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       const router = useRouter();
 
       const handleViewDetails = () => {

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, use } from "react";
+import { use } from "react";
 import { Button } from "@/components/ui/button";
-import { Patient } from "@/types";
+
 import { useRouter } from "next/navigation";
 
 import patients from "@/app/(dashboard)/patients/data.json";
@@ -29,7 +29,7 @@ export default function PatientDetailsPage({
       <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6">
         <h1 className="text-2xl font-bold">Patient Not Found</h1>
         <p className="text-muted-foreground">
-          The patient you're looking for doesn't exist.
+          The patient you&apos;re looking for doesn&apos;t exist.
         </p>
         <Button onClick={() => router.push("/patients")}>
           Back to Patients

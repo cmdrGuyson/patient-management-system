@@ -1,5 +1,3 @@
-import { ShieldPlus } from "lucide-react";
-
 import { LoginForm } from "@/components/features/auth/login-form";
 import Link from "next/link";
 import Logo from "@/components/features/common/logo";
