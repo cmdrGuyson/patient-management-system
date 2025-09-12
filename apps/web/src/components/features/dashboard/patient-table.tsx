@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Column, ColumnDef } from "@tanstack/react-table";
+import { Column } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 
 import { ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal } from "lucide-react";
@@ -20,7 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DataTable } from "../common/data-table";
+import { DataTable, StickyColumnDef } from "../common/data-table";
 import { Patient } from "@/types";
 
 import { Can } from "../common/can";
@@ -38,7 +38,7 @@ const getSortIcon = (column: Column<Patient>) => {
   return <ArrowUpDown className="ml-2 h-4 w-4" />;
 };
 
-export const columns: ColumnDef<Patient>[] = [
+export const columns: StickyColumnDef<Patient>[] = [
   {
     accessorKey: "firstName",
     header: ({ column }) => {
@@ -187,6 +187,7 @@ export const columns: ColumnDef<Patient>[] = [
   {
     id: "actions",
     enableHiding: false,
+    sticky: "right",
     cell: ({ row }) => {
       const patient = row.original;
 
@@ -217,12 +218,19 @@ export const columns: ColumnDef<Patient>[] = [
       return (
         <div className="flex items-center gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>More actions</p>
+              </TooltipContent>
+            </Tooltip>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />

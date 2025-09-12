@@ -52,8 +52,12 @@ import {
 } from "@/components/ui/tooltip";
 import { Label } from "@radix-ui/react-label";
 
+export type StickyColumnDef<T> = ColumnDef<T> & {
+  sticky?: "left" | "right";
+};
+
 type Props<T> = {
-  columns: ColumnDef<T>[];
+  columns: StickyColumnDef<T>[];
   data: T[];
   filterableColumns?: string[];
 };
@@ -157,14 +161,23 @@ export function DataTable<T>({ columns, data, filterableColumns }: Props<T>) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const stickyClass = (
+                    header.column.columnDef as StickyColumnDef<T>
+                  ).sticky
+                    ? (header.column.columnDef as StickyColumnDef<T>).sticky ===
+                      "left"
+                      ? "sticky left-0 z-10 bg-background"
+                      : "sticky right-0 z-10 bg-background"
+                    : "";
+
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className={stickyClass}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -184,14 +197,25 @@ export function DataTable<T>({ columns, data, filterableColumns }: Props<T>) {
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const stickyClass = (
+                      cell.column.columnDef as StickyColumnDef<T>
+                    ).sticky
+                      ? (cell.column.columnDef as StickyColumnDef<T>).sticky ===
+                        "left"
+                        ? "sticky left-0 z-10 bg-background"
+                        : "sticky right-0 z-10 bg-background"
+                      : "";
+
+                    return (
+                      <TableCell key={cell.id} className={stickyClass}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

@@ -81,7 +81,11 @@ export function ConfirmAction({
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>{children}</DrawerTrigger>
-        <DrawerContent className="max-h-[90vh] flex flex-col">
+        <DrawerContent
+          className="max-h-[90vh] flex flex-col"
+          aria-description="Confirmation modal"
+          aria-describedby="confirm-action"
+        >
           <DrawerHeader className="flex-shrink-0 px-4 pt-4">
             <DrawerTitle>{title}</DrawerTitle>
           </DrawerHeader>
@@ -96,7 +100,11 @@ export function ConfirmAction({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent
+        className="max-w-md"
+        aria-description="Confirmation modal"
+        aria-describedby="confirm-action"
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
