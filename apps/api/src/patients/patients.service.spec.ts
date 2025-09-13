@@ -74,7 +74,7 @@ describe("PatientsService", () => {
 
   describe("findAll", () => {
     it("should return an array of all patients", async () => {
-      const mockPatients: Patient[] = [
+      const mockPatients: Partial<Patient>[] = [
         {
           id: 1,
           firstName: "John",
@@ -82,7 +82,6 @@ describe("PatientsService", () => {
           email: "john.doe@example.com",
           phoneNumber: "+1234567890",
           dob: new Date("1990-01-01"),
-          additionalInformation: "Allergic to penicillin",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -93,7 +92,6 @@ describe("PatientsService", () => {
           email: "jane.smith@example.com",
           phoneNumber: "+0987654321",
           dob: new Date("1985-05-15"),
-          additionalInformation: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -101,11 +99,22 @@ describe("PatientsService", () => {
 
       const findManySpy = jest
         .spyOn(prismaService.patient, "findMany")
-        .mockResolvedValue(mockPatients);
+        .mockResolvedValue(mockPatients as Patient[]);
 
       const result = await service.findAll();
 
-      expect(findManySpy).toHaveBeenCalledWith();
+      expect(findManySpy).toHaveBeenCalledWith({
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          dob: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
       expect(result).toEqual(mockPatients);
       expect(result).toHaveLength(2);
     });
