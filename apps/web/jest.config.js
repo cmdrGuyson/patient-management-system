@@ -24,6 +24,7 @@ const customJestConfig = {
       statements: 80,
     },
   },
+  silent: true,
 };
 
 export default createJestConfig(customJestConfig);

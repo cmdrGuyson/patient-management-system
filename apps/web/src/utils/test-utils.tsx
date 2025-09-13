@@ -11,7 +11,7 @@ const mockAuthContext = {
   logout: jest.fn(),
   isLoading: false,
   refreshUser: jest.fn(),
-  hasPermission: jest.fn(() => false),
+  hasPermission: jest.fn((permission: string) => false),
 };
 
 jest.mock("@/contexts/auth-context", () => ({
