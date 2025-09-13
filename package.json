@@ -9,7 +9,8 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
-    "test:coverage": "turbo run test:coverage"
+    "test:coverage": "turbo run test:coverage",
+    "test:e2e": "turbo run test:e2e:db --filter=api"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
