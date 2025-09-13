@@ -461,9 +461,8 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
                               : undefined
                           }
                           onSelect={handleDateSelect}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
+                          disabled={(date) => date > new Date()}
+                          captionLayout="dropdown"
                         />
                       </PopoverContent>
                     </Popover>
