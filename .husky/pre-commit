@@ -1,0 +1,5 @@
+# Run linting for all workspaces
+yarn lint
+
+# Run type checking
+yarn check-types
