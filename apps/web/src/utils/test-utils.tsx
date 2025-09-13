@@ -1,31 +1,7 @@
 import React, { ReactElement } from "react";
 import { render, RenderOptions, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Mock Next.js router
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-  }),
-}));
-
-// Mock API module
-jest.mock("@/lib/api", () => ({
-  __esModule: true,
-  default: {
-    post: jest.fn(),
-    get: jest.fn(),
-    interceptors: {
-      request: { use: jest.fn() },
-      response: { use: jest.fn() },
-    },
-  },
-}));
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 // Mock auth context
 const mockAuthContext = {
@@ -54,7 +30,9 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
   });
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>{children}</SidebarProvider>
+    </QueryClientProvider>
   );
 };
 
