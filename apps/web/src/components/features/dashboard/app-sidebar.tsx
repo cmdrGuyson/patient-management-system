@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Bot, ContactRound, ShieldPlus } from "lucide-react";
+import { ContactRound, ShieldPlus } from "lucide-react";
 
 import { NavMain } from "@/components/features/dashboard/nav-main";
 import { NavUser } from "@/components/features/dashboard/nav-user";
@@ -25,11 +25,13 @@ const data = {
       url: "/patients",
       icon: ContactRound,
     },
+    /** TODO: Implement this
     {
       title: "AI Agent",
       url: "/agent",
       icon: Bot,
     },
+     */
   ],
 };
 
