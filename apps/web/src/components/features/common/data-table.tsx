@@ -127,7 +127,7 @@ export function DataTable<T>({ columns, data, filterableColumns }: Props<T>) {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-2 sm:ml-auto">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
