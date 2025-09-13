@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response.data);
       setPermissions(getPermissionsForRole(response.data.role));
     } catch (error: unknown) {
-      console.error("Failed to fetch user profile:", error);
       setUser(null);
 
       // Clear token if invalid
