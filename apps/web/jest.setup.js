@@ -18,16 +18,31 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
+// Mock ResizeObserver
+if (typeof window.ResizeObserver === "undefined") {
+  class ResizeObserverMock {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  window.ResizeObserver = ResizeObserverMock;
+}
+
 // Mock Next.js router
+const routerMock = {
+  push: jest.fn(),
+  replace: jest.fn(),
+  prefetch: jest.fn(),
+  back: jest.fn(),
+  forward: jest.fn(),
+  refresh: jest.fn(),
+};
+
+global.routerMock = routerMock;
+
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-  }),
+  useRouter: () => routerMock,
+  useSearchParams: () => new URLSearchParams(""),
 }));
 
 // Mock API module

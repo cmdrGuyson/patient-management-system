@@ -60,7 +60,7 @@ const getMockToken = () => {
 };
 
 // Test component with access to auth context
-const TestComponent = () => {
+const TestProbe = () => {
   const { token, user, isLoading, hasPermission } = useAuth();
 
   return (
@@ -84,7 +84,7 @@ describe("AuthContext", () => {
   it("provides initial state correctly", async () => {
     render(
       <AuthProvider>
-        <TestComponent />
+        <TestProbe />
       </AuthProvider>
     );
 
@@ -120,7 +120,7 @@ describe("AuthContext", () => {
 
     render(
       <AuthProvider>
-        <TestComponent />
+        <TestProbe />
       </AuthProvider>
     );
 
@@ -141,7 +141,7 @@ describe("AuthContext", () => {
 
     render(
       <AuthProvider>
-        <TestComponent />
+        <TestProbe />
       </AuthProvider>
     );
 

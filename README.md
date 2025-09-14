@@ -100,38 +100,42 @@ docker compose up
 ```
 pms/
 ├── apps/
-│   ├── web/                    # Next.js frontend application
+│   ├── web/                     # Next.js frontend application
 │   │   ├── src/
-│   │   │   ├── app/            # Next.js App Router pages
-│   │   │   │   ├── (auth)/     # Authentication routes
+│   │   │   ├── app/             # Next.js App Router pages
+│   │   │   │   ├── (auth)/      # Authentication routes
 │   │   │   │   ├── (dashboard)/ # Protected dashboard routes
-│   │   │   │   └── layout.tsx  # Root layout
-│   │   │   ├── components/     # React components
-│   │   │   │   ├── features/   # Feature-specific components
-│   │   │   │   ├── providers/  # Context providers
-│   │   │   │   └── ui/         # Reusable UI components
-│   │   │   ├── contexts/       # React contexts
-│   │   │   ├── hooks/          # Custom React hooks
-│   │   │   ├── lib/            # Utility functions and API client
-│   │   │   └── types/          # TypeScript type definitions
-│   │   └── public/             # Static assets
-│   └── api/                    # NestJS backend API
+│   │   │   │   └── layout.tsx   # Root layout
+│   │   │   ├── components/      # React components
+│   │   │   │   ├── features/    # Feature-specific components
+│   │   │   │   ├── providers/   # Context providers
+│   │   │   │   └── ui/          # Reusable UI components
+│   │   │   ├── contexts/        # React contexts
+│   │   │   ├── hooks/           # Custom React hooks
+│   │   │   ├── lib/             # Utility functions and API client
+│   │   │   ├── types/           # TypeScript type definitions
+│   │   │   └── __tests__/       # Test files
+│   │   │       ├── components/  # Component tests
+│   │   │       ├── contexts/    # Context tests
+│   │   │       └── integration/ # Integration tests
+│   │   └── public/              # Static assets
+│   └── api/                     # NestJS backend API
 │       ├── src/
-│       │   ├── auth/           # Authentication module
-│       │   ├── patients/       # Patient management module
-│       │   ├── users/          # User management module
-│       │   ├── prisma/         # Database service
-│       │   └── config/         # Configuration module
-│       ├── prisma/             # Database schema and migrations
-│       ├── data/               # Seed data (patients.json)
-│       └── test/               # E2E tests
-├── packages/                   # Shared packages
-│   ├── ui/                     # Shared UI components
-│   ├── eslint-config/          # Shared ESLint configurations
-│   └── typescript-config/      # Shared TypeScript configurations
-├── docker-compose.yml          # Development environment
-├── docker-compose.test.yml     # Testing environment
-└── turbo.json                  # Turborepo configuration
+│       │   ├── auth/            # Authentication module
+│       │   ├── patients/        # Patient management module
+│       │   ├── users/           # User management module
+│       │   ├── prisma/          # Database service
+│       │   └── config/          # Configuration module
+│       ├── prisma/              # Database schema and migrations
+│       ├── data/                # Seed data (patients.json)
+│       └── test/                # E2E tests
+├── packages/                    # Shared packages
+│   ├── ui/                      # Shared UI components
+│   ├── eslint-config/           # Shared ESLint configurations
+│   └── typescript-config/       # Shared TypeScript configurations
+├── docker-compose.yml           # Development environment
+├── docker-compose.test.yml      # Testing environment
+└── turbo.json                   # Turborepo configuration
 ```
 
 ## 🔐 Authentication & Authorization
