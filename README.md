@@ -210,6 +210,7 @@ yarn test:e2e
 
 ## 🔮 Future Improvements
 
+- Add paginated querying for patient list
 - Add permission aware AI agent for patient related queries
 
 ---
