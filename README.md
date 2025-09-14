@@ -208,6 +208,10 @@ yarn test
 yarn test:e2e
 ```
 
+## 🔮 Future Improvements
+
+- Add permission aware AI agent for patient related queries
+
 ---
 
 **Made with ❤️ by Gayanga Kuruppu**
