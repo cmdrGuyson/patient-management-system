@@ -52,8 +52,8 @@ const mockPatients: Patient[] = [
     phoneNumber: "+1234567890",
     dob: "1990-01-01",
     additionalInformation: "Allergic to penicillin",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
   },
   {
     id: 2,
@@ -63,8 +63,8 @@ const mockPatients: Patient[] = [
     phoneNumber: "+1234567891",
     dob: "1985-05-15",
     additionalInformation: "No known allergies",
-    createdAt: "2024-01-02T00:00:00Z",
-    updatedAt: "2024-01-02T00:00:00Z",
+    createdAt: "2025-01-02T00:00:00Z",
+    updatedAt: "2025-01-02T00:00:00Z",
   },
   {
     id: 3,
@@ -73,8 +73,8 @@ const mockPatients: Patient[] = [
     email: "bob.johnson@example.com",
     phoneNumber: "+1234567892",
     dob: "1992-12-25",
-    createdAt: "2024-01-03T00:00:00Z",
-    updatedAt: "2024-01-03T00:00:00Z",
+    createdAt: "2025-01-03T00:00:00Z",
+    updatedAt: "2025-01-03T00:00:00Z",
   },
 ];
 

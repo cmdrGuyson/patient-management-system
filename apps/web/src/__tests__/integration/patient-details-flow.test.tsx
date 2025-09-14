@@ -43,8 +43,8 @@ describe("Patient details flow integration", () => {
       phoneNumber: "+1234567890",
       dob: new Date("1990-01-01").toISOString(),
       additionalInformation: "N/A",
-      createdAt: new Date("2024-01-01").toISOString(),
-      updatedAt: new Date("2024-01-02").toISOString(),
+      createdAt: new Date("2025-01-01").toISOString(),
+      updatedAt: new Date("2025-01-02").toISOString(),
     };
 
     // Mock API calls

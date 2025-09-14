@@ -51,6 +51,8 @@ jest.mock("@/lib/api", () => ({
   default: {
     post: jest.fn(),
     get: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
     interceptors: {
       request: { use: jest.fn() },
       response: { use: jest.fn() },
