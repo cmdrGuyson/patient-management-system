@@ -2,6 +2,8 @@
 
 A delightful patient management system built with Next.js and NestJS, featuring role-based access control, dockerized development environment, comprehensive test coverage and a beautiful responsive interface.
 
+![PMS](./screenshot.png)
+
 ## 🏗️ Architecture Overview
 
 This project is built as a **Turborepo monorepo** containing:
